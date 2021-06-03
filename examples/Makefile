@@ -11,32 +11,29 @@ all: $(EXAMPLES)
 
 include ../mklove/Makefile.base
 
-CFLAGS += -I../src
-CXXFLAGS += -I../src -I../src-cpp
-
-SLIB=../src/libserdes.a
-SLIB_CPP=../src-cpp/libserdes++.a
+CFLAGS += -I/usr/local/include/libserdes
+CXXFLAGS += -I/usr/local/include/libserdes
 
 # lib must be compiled with -gstrict-dwarf, but examples must not,
 # due to some clang bug on OSX 10.9
 CPPFLAGS := $(subst strict-dwarf,,$(CPPFLAGS))
 
-serdes-kafka-avro-client: $(SLIB) serdes-kafka-avro-client.c
+serdes-kafka-avro-client: serdes-kafka-avro-client.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) serdes-kafka-avro-client.c \
-	-o $@ $(LDFLAGS) $(SLIB) $(LIBS) -lrdkafka
+	-o $@ $(LDFLAGS) $(LIBS) -lrdkafka -lserdes
 
-serdes-tool: $(SLIB) $(SLIB_CPP) serdes-tool.cpp
+serdes-tool: serdes-tool.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ \
-	-o $@ $(LDFLAGS) $(SLIB_CPP) $(SLIB) $(LIBS)
+	-o $@ $(LDFLAGS) $(LIBS) -lserdes++ -lserdes
 
 
-kafka-serdes-avro-console-consumer: $(SLIB) $(SLIB_CPP) kafka-serdes-avro-console-consumer.cpp
+kafka-serdes-avro-console-consumer: kafka-serdes-avro-console-consumer.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ \
-	-o $@ $(LDFLAGS) $(SLIB_CPP) $(SLIB) $(LIBS) -lrdkafka++ -lrdkafka
+	-o $@ $(LDFLAGS) $(SLIB_CPP) $(SLIB) $(LIBS) -lrdkafka++ -lrdkafka -lserdes++ -lserdes
 
-kafka-serdes-avro-console-producer: $(SLIB) $(SLIB_CPP) kafka-serdes-avro-console-producer.cpp
+kafka-serdes-avro-console-producer: kafka-serdes-avro-console-producer.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ \
-	-o $@ $(LDFLAGS) $(SLIB_CPP) $(SLIB) $(LIBS) -lrdkafka++ -lrdkafka
+	-o $@ $(LDFLAGS) $(LIBS) -lrdkafka++ -lrdkafka -lserdes++ -lserdes
 
 
 clean:

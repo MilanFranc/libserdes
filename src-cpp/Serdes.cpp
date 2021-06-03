@@ -221,7 +221,7 @@ ssize_t AvroImpl::serialize (Schema *schema, const avro::GenericDatum *datum,
   avro::ValidSchema *avro_schema = schema->object();
 
   /* Binary encoded output stream */
-  std::auto_ptr<avro::OutputStream> bin_os = avro::memoryOutputStream();
+  std::unique_ptr<avro::OutputStream> bin_os = avro::memoryOutputStream();
   /* Avro binary encoder */
   avro::EncoderPtr bin_encoder = avro::validatingEncoder(*avro_schema,
                                                          avro::binaryEncoder());
@@ -238,7 +238,7 @@ ssize_t AvroImpl::serialize (Schema *schema, const avro::GenericDatum *datum,
   }
 
   /* Extract written bytes. */
-  boost::shared_ptr<std::vector<uint8_t> > v;
+  std::shared_ptr<std::vector<uint8_t> > v;
   v = avro::snapshot(*bin_os.get());
 
   /* Write framing */
@@ -281,7 +281,7 @@ ssize_t AvroImpl::deserialize (Schema **schemap, avro::GenericDatum **datump,
   avro::ValidSchema *avro_schema = schema->object();
 
   /* Binary input stream */
-  std::auto_ptr<avro::InputStream> bin_is =
+  std::unique_ptr<avro::InputStream> bin_is =
       avro::memoryInputStream((const uint8_t *)payload, size);
 
   /* Binary Avro decoder */
